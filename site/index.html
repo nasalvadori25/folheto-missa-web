@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Folheto da Missa</title>
+<meta name="description" content="Folheto Povo de Deus da Arquidiocese de São Paulo, com a tela sempre acesa durante a missa.">
+<meta name="theme-color" content="#F7F4FA">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Folheto">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+:root{
+  --fundo:#F7F4FA; --tinta:#20162C; --cinza:#786E84; --roxo:#4A2470;
+  --linha:#E8E0F0; --cartao:#FFFFFF;
+  --serif: ui-serif, "New York", Georgia, "Times New Roman", serif;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+  --topo: env(safe-area-inset-top, 0px);
+  --base: env(safe-area-inset-bottom, 0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--fundo);color:var(--tinta);font:16px/1.45 var(--sans);-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+.oculto{display:none !important}
+
+/* ---------- lista ---------- */
+#lista{max-width:640px;margin:0 auto;padding:calc(var(--topo) + 18px) 16px calc(var(--base) + 32px)}
+.cab{display:flex;align-items:center;gap:12px;padding:0 4px 6px}
+.cab h1{margin:0;font:700 28px/1.1 var(--serif);color:var(--roxo);letter-spacing:-.2px}
+.cab p{margin:2px 0 0;font-size:13px;color:var(--cinza)}
+.cab .t{flex:1;min-width:0}
+.redondo{width:44px;height:44px;border-radius:50%;background:#fff;border:1px solid var(--linha);
+  display:grid;place-items:center;font-size:21px;color:var(--roxo);flex:none}
+.redondo:active{background:#efe8f6}
+.girando{animation:gira 1s linear infinite}
+@keyframes gira{to{transform:rotate(360deg)}}
+
+.dica{margin:12px 0 0;background:#fff;border:1px solid var(--linha);border-radius:18px;padding:14px 16px;
+  font-size:14px;display:flex;gap:12px;align-items:flex-start}
+.dica b{color:var(--roxo)}
+.dica .x{margin-left:auto;color:var(--cinza);font-size:18px;line-height:1;padding:2px 4px}
+.ico-comp{display:inline-block;width:18px;height:18px;vertical-align:-3px}
+
+.destaque{margin:14px 0 6px;border-radius:26px;padding:22px 22px 20px;color:#fff;
+  box-shadow:0 10px 28px -12px rgba(40,10,70,.55);position:relative;overflow:hidden}
+.destaque::after{content:"";position:absolute;right:-40px;top:-40px;width:180px;height:180px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.18),rgba(255,255,255,0) 70%)}
+.rotulo{font-size:12px;font-weight:700;letter-spacing:.16em;opacity:.85}
+.quando{font-size:15px;margin-top:6px;opacity:.92}
+.destaque h2{margin:2px 0 12px;font:700 29px/1.12 var(--serif);letter-spacing:-.2px}
+.pilula{display:inline-block;font-size:12px;padding:4px 11px;border-radius:20px;background:rgba(255,255,255,.18)}
+.botoes{display:flex;gap:10px;margin-top:18px}
+.b-abrir{flex:1;background:#fff;border-radius:14px;padding:14px 16px;font-weight:700;font-size:17px;text-align:center}
+.b-abrir:active{filter:brightness(.94)}
+.b-part{border:1.5px solid rgba(255,255,255,.55);border-radius:14px;padding:14px 16px;font-size:15px;color:#fff}
+.b-part:active{background:rgba(255,255,255,.15)}
+.nota{font-size:12.5px;opacity:.88;margin-top:12px}
+.status{text-align:center;font-size:12.5px;color:var(--cinza);padding:8px 10px 0}
+
+.secao{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--cinza);text-transform:uppercase;
+  padding:20px 6px 8px}
+.item{display:flex;align-items:center;gap:6px;width:100%;text-align:left;background:var(--cartao);
+  border-radius:18px;padding:14px 14px 14px 12px;margin:0 0 10px;box-shadow:0 1px 3px rgba(60,30,90,.08)}
+.item:active{background:#f1ebf7}
+.item.passado{opacity:.6}
+.faixa{width:5px;align-self:stretch;border-radius:3px;flex:none}
+.dia{width:58px;text-align:center;flex:none}
+.dia b{display:block;font:700 25px/1.05 var(--serif)}
+.dia small{font-size:11px;color:var(--cinza)}
+.txt{flex:1;min-width:0}
+.txt .n{font-size:16px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.txt .e{font-size:12px;color:var(--cinza);margin-top:3px}
+.txt .e .ok{color:#2E7D4F}
+.seta{font-size:26px;color:#c9bed6;flex:none;padding-left:4px}
+.rodape{font-size:12px;color:var(--cinza);text-align:center;padding:22px 10px 0;line-height:1.6}
+.rodape a{color:var(--roxo)}
+
+/* ---------- leitor ---------- */
+#leitor{position:fixed;inset:0;display:flex;flex-direction:column;background:#ECE8F1;z-index:5}
+#leitor.noite{background:#0E0914}
+.barra{display:flex;align-items:center;gap:4px;color:#fff;padding:calc(var(--topo) + 8px) 6px 8px;
+  box-shadow:0 2px 10px rgba(0,0,0,.18);flex:none;z-index:2}
+.barra .tt{flex:1;min-width:0;padding:0 4px}
+.barra .tt b{display:block;font:700 16px/1.25 var(--serif);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.barra .tt small{display:block;font-size:12px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bb{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.16);display:grid;place-items:center;
+  font-size:15px;flex:none;color:#fff}
+.bb:active{background:rgba(255,255,255,.32)}
+.bb.ativo{background:#fff;color:var(--c,#4A2470)}
+#paginas{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:10px 0 calc(var(--base) + 40px);position:relative}
+#folhas{margin:0 auto}
+.folha{background:#fff;margin:0 auto 10px;position:relative;box-shadow:0 2px 8px rgba(40,20,60,.16)}
+.folha canvas{display:block;width:100%;height:100%}
+.noite .folha{background:#000}
+.noite .folha canvas{filter:invert(1) hue-rotate(180deg)}
+#aviso{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:24px;color:#555;gap:14px}
+.noite #aviso{color:#bbb}
+.roda{width:40px;height:40px;border-radius:50%;border:4px solid rgba(0,0,0,.08);border-top-color:var(--c,#4A2470);
+  animation:gira .9s linear infinite}
+.b-tentar{background:var(--c,#4A2470);color:#fff;border-radius:14px;padding:12px 22px;font-weight:700;text-decoration:none}
+#indicador{position:fixed;left:50%;bottom:calc(var(--base) + 18px);transform:translateX(-50%);
+  background:rgba(20,12,30,.72);color:#fff;font-size:13px;padding:6px 14px;border-radius:20px;
+  opacity:0;transition:opacity .4s;pointer-events:none;z-index:3}
+#tela{position:fixed;left:50%;top:calc(var(--topo) + 70px);transform:translateX(-50%);width:min(92vw,420px);
+  background:#fff;color:var(--tinta);border-radius:16px;padding:12px 14px;font-size:13.5px;z-index:4;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);display:flex;gap:10px;align-items:flex-start}
+#tela .x{margin-left:auto;font-size:18px;color:var(--cinza);padding:0 4px}
+</style>
+</head>
+<body>
+
+<main id="lista">
+  <div class="cab">
+    <div class="t">
+      <h1>Folheto da Missa</h1>
+      <p>Povo de Deus · Arquidiocese de São Paulo</p>
+    </div>
+    <button class="redondo" id="atualizar" aria-label="Atualizar lista">↻</button>
+  </div>
+
+  <div class="dica oculto" id="instalar">
+    <div>
+      <b>Instale no iPhone:</b> toque em
+      <svg class="ico-comp" viewBox="0 0 24 24" fill="none" stroke="#4A2470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>
+      <b>Compartilhar</b> e depois em <b>“Adicionar à Tela de Início”</b>. Ele vira um app com ícone.
+    </div>
+    <button class="x" id="fecharDica" aria-label="Fechar">×</button>
+  </div>
+
+  <section class="destaque" id="destaque">
+    <div class="rotulo" id="dRotulo">FOLHETO DA MISSA</div>
+    <div class="quando" id="dQuando"></div>
+    <h2 id="dNome">Carregando…</h2>
+    <span class="pilula oculto" id="dCor"></span>
+    <div class="botoes oculto" id="dBotoes">
+      <button class="b-abrir" id="dAbrir">Abrir folheto</button>
+      <button class="b-part" id="dPart">♫ Partituras</button>
+    </div>
+    <div class="nota" id="dNota"></div>
+  </section>
+  <div class="status" id="status"></div>
+
+  <div id="itens"></div>
+
+  <div class="rodape">
+    Folhetos do <a href="https://arquisp.org.br/folheto-povo-de-deus/" target="_blank" rel="noopener">site da Arquidiocese de São Paulo</a>.<br>
+    <span id="atualizado"></span>
+  </div>
+</main>
+
+<section id="leitor" class="oculto" aria-label="Folheto">
+  <div class="barra" id="barra">
+    <button class="bb" id="voltar" aria-label="Voltar">←</button>
+    <div class="tt"><b id="lTitulo"></b><small id="lData"></small></div>
+    <button class="bb" id="menos" aria-label="Diminuir">A−</button>
+    <button class="bb" id="mais" aria-label="Aumentar">A+</button>
+    <button class="bb" id="noite" aria-label="Modo noturno">☾</button>
+    <button class="bb oculto" id="lPart" aria-label="Partituras">♫</button>
+  </div>
+  <div id="paginas">
+    <div id="folhas"></div>
+    <div id="aviso"></div>
+  </div>
+  <div id="indicador"></div>
+  <div id="tela" class="oculto">
+    <div>☀️ <span id="telaTxt"></span></div>
+    <button class="x" id="fecharTela" aria-label="Fechar">×</button>
+  </div>
+</section>
+
+<script src="pdfjs/pdf.min.js"></script>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const DIAS = ["Domingo","Segunda-feira","Terça-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sábado"];
+const DIAS_C = ["dom","seg","ter","qua","qui","sex","sáb"];
+const MESES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+const CORES = {verde:"#2E7D4F", roxo:"#5B2A86", branco:"#B8892B", vermelho:"#B3261E", rosa:"#C95C87"};
+
+let dados = [];
+let atualizadoEm = "";
+
+/* ---------------- liturgia e datas ---------------- */
+function normal(s){
+  return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/º/g,"o").replace(/ª/g,"a");
+}
+function corLiturgica(nome){
+  const n = normal(nome);
+  if (/defuntos|finados/.test(n)) return "roxo";
+  if (/3o domingo do advento|4o domingo d[ae] quaresma/.test(n)) return "rosa";
+  if (/advento|quaresma|cinzas/.test(n)) return "roxo";
+  if (/pentecostes|ramos|paixao|pedro e sao paulo|santa cruz|martir/.test(n)) return "vermelho";
+  if (/tempo comum/.test(n)) return "verde";
+  return "branco";
+}
+function hex(c){ const n=parseInt(c.slice(1),16); return [n>>16,(n>>8)&255,n&255]; }
+function rgb(a){ return "rgb("+a.map(x=>Math.round(Math.max(0,Math.min(255,x)))).join(",")+")"; }
+function escurecer(c,f){ return rgb(hex(c).map(x=>x*f)); }
+function clarear(c,f){ return rgb(hex(c).map(x=>x+(255-x)*f)); }
+
+function dataDe(iso){ const [a,m,d]=iso.split("-").map(Number); return new Date(a,m-1,d); }
+function hoje(){ const d=new Date(); d.setHours(0,0,0,0); return d; }
+const DIA_MS = 86400000;
+function dataLonga(dt){ return DIAS[dt.getDay()]+", "+dt.getDate()+" de "+MESES[dt.getMonth()]; }
+function mesAno(dt){ const m=MESES[dt.getMonth()]; return m[0].toUpperCase()+m.slice(1)+" de "+dt.getFullYear(); }
+
+/* ---------------- dados ---------------- */
+async function carregar(){
+  $("atualizar").classList.add("girando");
+  $("status").textContent = "Buscando folhetos…";
+  try{
+    const r = await fetch("data/folhetos.json", {cache:"no-cache"});
+    if (!r.ok) throw new Error(r.status);
+    const j = await r.json();
+    dados = j.folhetos || [];
+    atualizadoEm = j.atualizado || "";
+    try{ localStorage.setItem("folhetos", JSON.stringify(j)); }catch(e){}
+    $("status").textContent = "Toque num folheto para abrir";
+  }catch(e){
+    try{
+      const j = JSON.parse(localStorage.getItem("folhetos")||"null");
+      if (j){ dados=j.folhetos; atualizadoEm=j.atualizado; }
+    }catch(e2){}
+    $("status").textContent = dados.length ? "Sem internet agora — mostrando a lista salva" :
+      "Não consegui carregar a lista. Verifique a internet e toque em ↻";
+  }
+  $("atualizar").classList.remove("girando");
+  desenhar();
+  preBaixar();
+}
+// guarda o folheto da próxima missa no celular, para abrir mesmo sem sinal na igreja
+function preBaixar(){
+  if (!destaque || !destaque.arquivo || !("serviceWorker" in navigator)) return;
+  navigator.serviceWorker.ready.then(()=>fetch(destaque.arquivo).catch(()=>{}));
+}
+
+/* ---------------- lista ---------------- */
+let destaque = null;
+function desenhar(){
+  const h = hoje();
+  destaque = null;
+  const futuros=[], passados=[];
+  for (const it of dados){
+    const d = dataDe(it.data);
+    if (d >= h){ if(!destaque) destaque=it; else futuros.push(it); }
+    else passados.unshift(it);
+  }
+  // cartão de destaque
+  const box = $("destaque");
+  if (destaque){
+    const cor = CORES[corLiturgica(destaque.nome)];
+    const d = dataDe(destaque.data);
+    const dif = Math.round((d-h)/DIA_MS);
+    box.style.background = "linear-gradient(135deg,"+clarear(cor,.08)+","+escurecer(cor,.62)+")";
+    $("dRotulo").textContent = dif===0 ? "HOJE" : dif===1 ? "AMANHÃ" : "PRÓXIMA MISSA";
+    $("dQuando").textContent = dataLonga(d);
+    $("dNome").textContent = destaque.nome;
+    $("dCor").textContent = "●  Cor litúrgica: "+corLiturgica(destaque.nome);
+    $("dCor").classList.remove("oculto");
+    $("dBotoes").classList.remove("oculto");
+    $("dAbrir").style.color = escurecer(cor,.85);
+    $("dPart").classList.toggle("oculto", !destaque.partitura_url);
+    $("dNota").textContent = "A tela fica acesa enquanto o folheto estiver aberto";
+  } else {
+    box.style.background = "linear-gradient(135deg,#5B2A86,#2e1450)";
+    $("dRotulo").textContent = "FOLHETO DA MISSA";
+    $("dQuando").textContent = "";
+    $("dNome").textContent = dados.length ? "Nenhum folheto novo ainda" : "Carregando…";
+    $("dCor").classList.add("oculto");
+    $("dBotoes").classList.add("oculto");
+    $("dNota").textContent = dados.length ? "A Arquidiocese ainda não publicou os próximos." : "";
+  }
+
+  // lista
+  const cont = $("itens");
+  cont.textContent = "";
+  let mes = null;
+  for (const it of futuros){
+    const m = mesAno(dataDe(it.data));
+    if (m !== mes){ cont.appendChild(secao(m)); mes = m; }
+    cont.appendChild(cartao(it, false));
+  }
+  if (passados.length){
+    cont.appendChild(secao("Celebrações anteriores"));
+    for (const it of passados) cont.appendChild(cartao(it, true));
+  }
+  $("atualizado").textContent = atualizadoEm ? "Lista atualizada em "+atualizadoEm : "";
+}
+function secao(t){ const d=document.createElement("div"); d.className="secao"; d.textContent=t; return d; }
+function cartao(it, passado){
+  const cor = CORES[corLiturgica(it.nome)];
+  const d = dataDe(it.data);
+  const b = document.createElement("button");
+  b.className = "item"+(passado?" passado":"");
+  const faixa = document.createElement("span"); faixa.className="faixa"; faixa.style.background=cor;
+  const dia = document.createElement("span"); dia.className="dia";
+  const db = document.createElement("b"); db.textContent=d.getDate(); db.style.color=escurecer(cor,.85);
+  const ds = document.createElement("small"); ds.textContent = DIAS_C[d.getDay()]+(passado?" · "+MESES[d.getMonth()].slice(0,3):"");
+  dia.append(db, ds);
+  const txt = document.createElement("span"); txt.className="txt";
+  const n = document.createElement("span"); n.className="n"; n.textContent=it.nome;
+  const e = document.createElement("span"); e.className="e"; e.textContent="Cor litúrgica: "+corLiturgica(it.nome);
+  txt.append(n, e);
+  const seta = document.createElement("span"); seta.className="seta"; seta.textContent="›";
+  b.append(faixa, dia, txt, seta);
+  b.addEventListener("click", ()=>abrir(it, false));
+  let t; // segurar = partituras
+  b.addEventListener("touchstart", ()=>{ t=setTimeout(()=>{ t=null; if(it.partitura_url) abrir(it,true); }, 600); }, {passive:true});
+  b.addEventListener("touchend", ev=>{ if(t){clearTimeout(t);} else { ev.preventDefault(); } });
+  b.addEventListener("touchmove", ()=>{ if(t){clearTimeout(t); t=undefined;} }, {passive:true});
+  return b;
+}
+
+/* ---------------- leitor ---------------- */
+let pdf = null, tarefa = null, zoom = parseFloat(localStorage.getItem("zoom")||"1") || 1;
+let noite = localStorage.getItem("noite")==="1";
+let folhas = [], observador = null, geracao = 0, atual = null;
+
+function abrir(it, partitura){
+  atual = {it, partitura};
+  history.pushState({leitor:1}, "", "#folheto");
+  mostrarLeitor();
+}
+window.addEventListener("popstate", ()=>{ if (!$("leitor").classList.contains("oculto")) fecharLeitor(true); });
+
+function mostrarLeitor(){
+  const {it, partitura} = atual;
+  const cor = CORES[corLiturgica(it.nome)];
+  const L = $("leitor");
+  L.style.setProperty("--c", cor);
+  L.classList.remove("oculto");
+  L.classList.toggle("noite", noite);
+  $("noite").classList.toggle("ativo", noite);
+  pintarBarra();
+  $("lTitulo").textContent = (partitura ? "Partituras · " : "") + it.nome;
+  $("lData").textContent = dataLonga(dataDe(it.data));
+  $("lPart").classList.toggle("oculto", partitura || !it.partitura_url);
+  document.body.style.overflow = "hidden";
+  manterTelaAcesa();
+  carregarPdf(partitura ? it.partitura_arquivo : it.arquivo, partitura ? it.partitura_url : it.url);
+}
+function pintarBarra(){
+  const cor = noite ? "#1E1428" : CORES[corLiturgica(atual.it.nome)];
+  $("barra").style.background = "linear-gradient(90deg,"+cor+","+escurecer(cor,.75)+")";
+  document.querySelector('meta[name="theme-color"]').setAttribute("content", noite ? "#1E1428" : cor);
+}
+function fecharLeitor(doHistorico){
+  $("leitor").classList.add("oculto");
+  document.body.style.overflow = "";
+  document.querySelector('meta[name="theme-color"]').setAttribute("content", "#F7F4FA");
+  soltarTela();
+  limparPdf();
+  if (!doHistorico && location.hash === "#folheto") history.back();
+}
+$("voltar").addEventListener("click", ()=>fecharLeitor(false));
+$("lPart").addEventListener("click", ()=>{ limparPdf(); atual = {it: atual.it, partitura: true}; mostrarLeitor(); });
+$("menos").addEventListener("click", ()=>mudarZoom(-0.25));
+$("mais").addEventListener("click", ()=>mudarZoom(0.25));
+$("noite").addEventListener("click", ()=>{
+  noite = !noite; localStorage.setItem("noite", noite?"1":"0");
+  $("leitor").classList.toggle("noite", noite); $("noite").classList.toggle("ativo", noite); pintarBarra();
+});
+
+function aviso(html){ $("aviso").innerHTML = html; $("aviso").classList.toggle("oculto", !html); }
+
+function limparPdf(){
+  geracao++;
+  if (observador){ observador.disconnect(); observador = null; }
+  if (tarefa){ try{ tarefa.destroy(); }catch(e){} tarefa = null; }
+  if (pdf){ try{ pdf.destroy(); }catch(e){} pdf = null; }
+  folhas = [];
+  $("folhas").textContent = "";
+}
+
+async function carregarPdf(local, remoto){
+  limparPdf();
+  const g = geracao;
+  if (!local){
+    aviso('<div>Este folheto ainda não foi copiado para o app.<br>Você pode abrir direto no site da Arquidiocese<br>(mas aí a tela pode apagar).</div>'+
+          '<a class="b-tentar" href="'+remoto+'" target="_blank" rel="noopener">Abrir no site</a>');
+    return;
+  }
+  if (!window.pdfjsLib){ aviso('<div>Não consegui carregar o leitor de PDF.<br>Verifique a internet.</div>'); return; }
+  aviso('<div class="roda"></div><div id="prog">Abrindo o folheto…</div>');
+  try{
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "pdfjs/pdf.worker.min.js";
+    tarefa = pdfjsLib.getDocument({url: local, disableAutoFetch: false});
+    tarefa.onProgress = p => { if (p.total && $("prog")) $("prog").textContent = "Baixando o folheto… "+Math.round(p.loaded*100/p.total)+"%"; };
+    const doc = await tarefa.promise;
+    if (g !== geracao){ doc.destroy(); return; }
+    pdf = doc;
+    const props = [];
+    for (let i=1; i<=pdf.numPages; i++){
+      const p = await pdf.getPage(i);
+      const v = p.getViewport({scale:1});
+      props.push(v.height/v.width);
+    }
+    if (g !== geracao) return;
+    montarFolhas(props);
+    aviso("");
+    $("paginas").scrollTop = 0;
+    mostrarIndicador();
+  }catch(e){
+    if (g !== geracao) return;
+    aviso('<div>Não consegui abrir o folheto.<br>Verifique a internet.</div><button class="b-tentar" id="tentar">Tentar de novo</button>');
+    $("tentar").onclick = ()=>carregarPdf(local, remoto);
+  }
+}
+
+function larguraBase(){ return Math.min($("paginas").clientWidth, 900) - 0; }
+function montarFolhas(props){
+  const W = Math.round(larguraBase()*zoom);
+  $("folhas").style.width = W+"px";
+  $("folhas").textContent = "";
+  folhas = props.map((pr, i)=>{
+    const f = document.createElement("div");
+    f.className = "folha";
+    f.style.width = W+"px";
+    f.style.height = Math.round(W*pr)+"px";
+    f.dataset.n = i+1;
+    $("folhas").appendChild(f);
+    return {el:f, prop:pr, feito:false, desenhando:false};
+  });
+  if (observador) observador.disconnect();
+  observador = new IntersectionObserver(entradas=>{
+    for (const en of entradas){
+      const fo = folhas[en.target.dataset.n-1];
+      if (!fo) continue;
+      if (en.isIntersecting) desenharFolha(fo, en.target.dataset.n|0);
+      else if (fo.feito){ // libera memória das páginas longe da tela
+        const c = fo.el.querySelector("canvas"); if (c){ c.width=0; c.height=0; c.remove(); }
+        fo.feito = false;
+      }
+    }
+  }, {root:$("paginas"), rootMargin:"900px 300px"});
+  folhas.forEach(f=>observador.observe(f.el));
+}
+
+async function desenharFolha(fo, n){
+  if (fo.feito || fo.desenhando || !pdf) return;
+  fo.desenhando = true;
+  const g = geracao;
+  try{
+    const page = await pdf.getPage(n);
+    const cssW = fo.el.clientWidth;
+    const v1 = page.getViewport({scale:1});
+    let escala = cssW / v1.width * Math.min(window.devicePixelRatio||1, 2.5);
+    // o iPhone limita o tamanho de cada imagem; reduz se passar de ~12 milhões de pixels
+    const px = (v1.width*escala)*(v1.height*escala);
+    if (px > 12e6) escala *= Math.sqrt(12e6/px);
+    const vp = page.getViewport({scale:escala});
+    const c = document.createElement("canvas");
+    c.width = Math.floor(vp.width); c.height = Math.floor(vp.height);
+    await page.render({canvasContext:c.getContext("2d", {alpha:false}), viewport:vp}).promise;
+    if (g !== geracao){ c.width=0; return; }
+    const velho = fo.el.querySelector("canvas"); if (velho){ velho.width=0; velho.remove(); }
+    fo.el.appendChild(c);
+    fo.feito = true;
+  }catch(e){}
+  fo.desenhando = false;
+}
+
+function mudarZoom(d){
+  const novo = Math.max(1, Math.min(2.5, zoom+d));
+  if (novo===zoom || !folhas.length) return;
+  const P = $("paginas");
+  const fy = P.scrollTop / Math.max(1, P.scrollHeight);
+  const fx = (P.scrollLeft + P.clientWidth/2) / Math.max(1, P.scrollWidth);
+  zoom = novo; localStorage.setItem("zoom", zoom);
+  geracao++;
+  const props = folhas.map(f=>f.prop);
+  montarFolhas(props);
+  P.scrollTop = fy * P.scrollHeight;
+  P.scrollLeft = Math.max(0, fx*P.scrollWidth - P.clientWidth/2);
+}
+
+let tIndicador;
+function mostrarIndicador(){
+  if (!folhas.length) return;
+  const P = $("paginas"), meio = P.scrollTop + P.clientHeight/2;
+  let n = 1;
+  for (let i=0;i<folhas.length;i++){ if (folhas[i].el.offsetTop <= meio) n = i+1; }
+  const ind = $("indicador");
+  ind.textContent = "Página "+n+" de "+folhas.length;
+  ind.style.opacity = 1;
+  clearTimeout(tIndicador);
+  tIndicador = setTimeout(()=>ind.style.opacity=0, 1500);
+}
+$("paginas").addEventListener("scroll", mostrarIndicador, {passive:true});
+let tResize;
+window.addEventListener("resize", ()=>{ clearTimeout(tResize); tResize=setTimeout(()=>{ if(folhas.length){ geracao++; montarFolhas(folhas.map(f=>f.prop)); } }, 300); });
+
+/* ---------------- tela acesa ---------------- */
+let trava = null;
+async function manterTelaAcesa(){
+  try{
+    if ("wakeLock" in navigator){
+      trava = await navigator.wakeLock.request("screen");
+      trava.addEventListener("release", ()=>{ trava = null; });
+      $("tela").classList.add("oculto");
+      return;
+    }
+  }catch(e){}
+  if (!localStorage.getItem("avisoTela")){
+    $("telaTxt").textContent = "Este celular não deixou o app manter a tela acesa. No iPhone, atualize o iOS ou use Ajustes › Tela e Brilho › Bloqueio Automático durante a missa.";
+    $("tela").classList.remove("oculto");
+  }
+}
+function soltarTela(){ if (trava){ try{ trava.release(); }catch(e){} trava = null; } }
+document.addEventListener("visibilitychange", ()=>{
+  if (document.visibilityState==="visible" && !$("leitor").classList.contains("oculto")) manterTelaAcesa();
+});
+$("fecharTela").addEventListener("click", ()=>{ $("tela").classList.add("oculto"); localStorage.setItem("avisoTela","1"); });
+
+/* ---------------- instalação e início ---------------- */
+const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+const instalado = window.navigator.standalone || matchMedia("(display-mode: standalone)").matches;
+if (ios && !instalado && !localStorage.getItem("dicaFechada")) $("instalar").classList.remove("oculto");
+$("fecharDica").addEventListener("click", ()=>{ $("instalar").classList.add("oculto"); localStorage.setItem("dicaFechada","1"); });
+
+$("atualizar").addEventListener("click", carregar);
+$("dAbrir").addEventListener("click", ()=>{ if (destaque) abrir(destaque, false); });
+$("dPart").addEventListener("click", ()=>{ if (destaque && destaque.partitura_url) abrir(destaque, true); });
+
+if ("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+}
+if (location.hash === "#folheto") history.replaceState(null, "", location.pathname);
+carregar();
+</script>
+</body>
+</html>
