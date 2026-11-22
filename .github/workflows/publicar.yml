@@ -1,0 +1,67 @@
+name: Publicar o site
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 9 * * *'    # todo dia às 6h17 (horário de Brasília)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  montar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Buscar os folhetos no site da Arquidiocese
+        run: python3 scripts/atualizar.py
+
+      - name: Leitor de PDF (pdf.js)
+        run: |
+          npm pack pdfjs-dist@3.11.174 --silent
+          tar xzf pdfjs-dist-3.11.174.tgz
+          mkdir -p site/pdfjs
+          cp package/legacy/build/pdf.min.js package/legacy/build/pdf.worker.min.js site/pdfjs/
+
+      - name: Ícones
+        run: |
+          sudo apt-get install -y -qq librsvg2-bin > /dev/null
+          for s in 180 192 512; do rsvg-convert -w $s -h $s site/icon.svg -o site/icon-$s.png; done
+
+      # Repositórios públicos sem novidades por 60 dias têm o agendamento pausado pelo GitHub.
+      # Um registro semanal mantém a busca diária funcionando.
+      - name: Registro semanal
+        if: github.event_name == 'schedule'
+        run: |
+          if [ "$(date +%u)" = "1" ]; then
+            date -u +%Y-%m-%dT%H:%MZ > ultima-busca.txt
+            git config user.name "folheto-robo"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add ultima-busca.txt
+            git commit -m "Busca semanal dos folhetos" || true
+            git push || true
+          fi
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  publicar:
+    needs: montar
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.pages.outputs.page_url }}
+    steps:
+      - id: pages
+        uses: actions/deploy-pages@v4
